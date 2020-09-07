@@ -45,6 +45,7 @@ class Auth {
 
       if (response.statusCode == 200) {
         LoggedInUser();
+
         return "Success";
       }
     } catch (error) {
