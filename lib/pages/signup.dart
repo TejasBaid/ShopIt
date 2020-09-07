@@ -37,6 +37,10 @@ class _SignupPageState extends State<SignupPage> {
     print(url);
       Auth auth =new Auth(name: name,email: _Email.text,password: _Password.text,signupUrl: url);
       var status = await auth.Signup();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      //Return String
+//      String stringValue = prefs.getString('uid');
+//      print(stringValue);
 
 
   }

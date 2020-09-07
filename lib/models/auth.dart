@@ -29,9 +29,10 @@ class Auth {
         return "Server Error";
     }
   }
-  void LoggedInUser() async{
+  void LoggedInUser(uid) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLoggedIn', true);
+    prefs.setString('uid',uid);
   }
   Future <String> Signup() async {
     try {
@@ -40,12 +41,13 @@ class Auth {
         "email": email,
         "password": password,
       });
+
       print(response.data['_id']);
       var jsonResponse = response.toString();
 
       if (response.statusCode == 200) {
-        LoggedInUser();
-
+        var uid = response.data['_id'];
+        LoggedInUser(uid);
         return "Success";
       }
     } catch (error) {
@@ -62,7 +64,8 @@ class Auth {
       });
       print(response.data['_id']);
       if (response.statusCode == 200) {
-        LoggedInUser();
+        var uid = response.data['_id'];
+        LoggedInUser(uid);
         return "Success";
       }
     } catch (error) {
