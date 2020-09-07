@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -18,10 +19,11 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   var showpass = true;
   var errorMessage;
-  String url = '${apiKey}/api/auth/signup';
+  String url = '${apiKey}api/auth/signup';
   String email;
   String password;
   Dio dio = new Dio(BaseOptions(contentType: Headers.jsonContentType,responseType: ResponseType.json,validateStatus: (_)=>true,));
+
 
   // Controllers
   final _FirstName = TextEditingController();
@@ -32,9 +34,10 @@ class _SignupPageState extends State<SignupPage> {
 
   void signup () async{
     var name = _FirstName.text + " " + _LastName.text;
+    print(url);
       Auth auth =new Auth(name: name,email: _Email.text,password: _Password.text,signupUrl: url);
       var status = await auth.Signup();
-      print("Status");
+
 
   }
 

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
@@ -10,52 +10,64 @@ class Auth {
   String loginUrl;
   String password;
 
-  Dio dio = new Dio(BaseOptions(contentType: Headers.jsonContentType,responseType: ResponseType.json,));
+  Dio dio = new Dio(BaseOptions(
+    contentType: Headers.jsonContentType, responseType: ResponseType.json,));
 
-  Auth({this.name,this.password,this.email,this.signupUrl,this.loginUrl});
+  Auth({this.name, this.password, this.email, this.signupUrl, this.loginUrl});
 
-  Future <String> Signup() async{
+  String ErrorCheck(error){
+    switch (error.response.statusCode) {
+      case 400:
+        Map<String, dynamic> map = jsonDecode(error.response.toString());
+        print(map['errors']);
+        return map['errors'];
+      case 401:
+        Map<String, dynamic> map = jsonDecode(error.response.toString());
+        print(map['msg']);
+        return map['msg'];
+      case 500:
+        return "Server Error";
+    }
+  }
+  void LoggedInUser() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', true);
+  }
+  Future <String> Signup() async {
     try {
       Response response = await dio.post(signupUrl, data: {
-        "name":name,
-        "email":email,
+        "name": name,
+        "email": email,
         "password": password,
       });
+      print(response.data['_id']);
+      var jsonResponse = response.toString();
 
-      var statusCode = response.statusCode.toString();
-      var js = response.toString();
-
-      if(statusCode == "401" || statusCode == "400"){
-        Map<String, dynamic> map = jsonDecode(js);
-        return map['msg'];
-      }else if(statusCode == "200"){
+      if (response.statusCode == 200) {
+        LoggedInUser();
         return "Success";
       }
-
-    }catch(error){
-      print(error.toString());
+    } catch (error) {
+      ErrorCheck(error);
     }
   }
-  Future <String> Login() async{
-    try{
-      Response response = await dio.post(loginUrl,data: {
-        "email":"tejasbaid3@gmail.com",
-        "password":"1234567",
+
+
+  Future <String> Login() async {
+    try {
+      Response response = await dio.post(loginUrl, data: {
+        "email": email,
+        "password": password,
       });
-      var statusCode = response.statusCode.toString();
-      var js = response.toString();
-
-      if(statusCode == "401" || statusCode == "400"){
-        Map<String, dynamic> map = jsonDecode(js);
-        return map['msg'];
-      }else if(statusCode == "200"){
+      print(response.data['_id']);
+      if (response.statusCode == 200) {
+        LoggedInUser();
         return "Success";
       }
-
-    }catch(error){
-      print(error.toString());
+    } catch (error) {
+      ErrorCheck(error);
     }
   }
-
-
 }
+
+
